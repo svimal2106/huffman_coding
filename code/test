@@ -1,0 +1,140 @@
+CS330 Operating Systems
+Assignment 3 Synchronization
+­Group members:
+Anurag Kumar Singh
+Rohan Jingar
+Shubham Tulsiani
+Vimal Sharma
+
+Part 1 Shared Memory
+Implementation of Shared Memory
+•
+
+We reserve the last page of machine's physical memory for shared memory.While 
+allocating the address space of a process in “Load” function of addrspace.cc,we 
+append an extra virtual page at the end.
+numpages = numpages+1
+
+•
+
+Although we increase numpages by one,we keep the variable “size” unchanged to 
+ensure that only the actual contents of the process address space are copied to the 
+main memory.
+
+•
+
+When a process calls “shared_memory_open”,we return the address of the beginning 
+of the appended page. 
+
+•
+
+We have made changes in “translate.cc” such that when a process makes a system call 
+to read/write from the shared memory,the virtual address which is passed as an 
+argument is translated to get the appropriate location on the last page of the machine's 
+physical memory.
+
+ 
+
+We have implemented the following system calls:
+• Shared_memory_open()
+returns the virtual address of the appended last virtual page.
+•
+
+Read_shared_mem(int addr,int offset)
+returns 4 bytes (int) of data stored at the virtual  address addr+offset.
+
+•
+
+Write_shared_mem(int addr,int offset,int val)
+writes “val” at the virtual address addr+offset
+
+Part 2 Semaphores
+For   creating   semaphores   in   Nachos   we   are   using   the   semaphore   class   defined   in 
+/threads/synch.h. We defined a global array of 20 such semahores in exception.cc.
+We have implemented the following system calls for the implementation of semaphores in 
+Nachos:
+•
+
+int semaphore_create(int val );
+
+this system call first checks through the array of semaphores which one is not 
+being used and sets its value as val and returns the corresponding index. This 
+index is treated as unique id of a semaphores. Different processes use this id to 
+distinguish between different semaphores. If no semaphore is free it returns an 
+arror.
+•
+
+Semahore_wait(int id) 
+
+this system call calls the function P() defined in the semaphore class of the 
+semaphore of the given id. If the value of semaphore is greater than zero then 
+the process decrements the value and returns. If value is less than zero i.e. 
+other processes are also waiting on the semaphore, in this case the process is 
+appended in queue of waiting processes.
+•
+
+Semaphore_signal(int id) 
+
+this   system   call   calls   the   function   V()   defined   in   the   class   Semaphore.   It 
+checks whether the waiting queue is empty. If there are processes waiting for 
+that semaphore then it removes the front process and appends it in the ready 
+list. And then it increments the value of the semaphore.
+•
+
+Semaphore_destroy(int id)
+
+this system call sets the status of the corresponding semaphore as not being 
+used. It sets the status variable to 0. And now the semaphore is free to be 
+created by any other process.
+
+Part 3 Dining Philosopher's problem
+
+We have implemented a solution or the dining philosophers using a semaphore (initial value 
+1) for each chopstick and a semaphore for the dining table(initial value 4). 
+•
+
+•
+•
+
+•
+
+Any philosopher who wishes to eat waits on the table, then on the chopstick to his 
+left, then the one to his right. Then he starts eating (implemented as counting to some 
+number).
+ After eating, he signals all these three semaphores and repeats the protocol whenver 
+he wishes to eat again.
+ So, only 4 philosophers are on the dining table at any point of time and they leave 
+the table when they think(implemented as counting to some number). This obviously 
+prevents deadlock.
+ Also, since the waiting queues for the resources and scheduling from ready list(if 
+philosophers have same priority) is implemented as FCFS, this ensures that there is 
+no starvation as if a philosopher starts wating on a resource, no one who started 
+
+•
+
+waiting after him can get the resource before him, so, every philosopher will get a 
+chance to eat within a bounded time.
+We have used shared memory to coordinate the processes as the main process which 
+creates the dining table and chopsticks uses shared memory to communicate the 
+location of these semaphores to the 
+philosophers.
+TESTING
+• We made all the philosophers 'eat' 200 times each and printed the order in 
+which they ate. We analysed the first 200(out of 1000) to see how many ties 
+each phillosopher ate.
+• If the philosophers were same (all counted to the same numbers), we found 
+that they ate exactly 40 times each.
+• Even if they were very different (one philosopher 'thinks' a lot, other 4 dont 
+'think' at all and immediately want to 'eat' again), the performance was sstill 
+very good as no philosopher ate less than 35 
+times (out of 200).
+• These clearly validates that the solution we have implemented satisfies the 
+required conditions.
+
+Note :
+for testing dining phillosopher problem simply run /test/t6
+It will execute two programs. First program will open the shared memory and the 
+second program is the halt.c which is modified to call other philosopher's processes 
+after initializing various semaphores.
+./nachos -x ../test/t6
+

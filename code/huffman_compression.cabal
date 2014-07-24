@@ -1,0 +1,22 @@
+Name:                haskell
+Version:             0.0
+Description:         text based files compression
+License:             GPL
+Author:              Rohan Jingar and Vimal Sharma
+Maintainer:          svimal2106@gmail.com
+Build-Type:          Simple
+Cabal-Version:       >=1.2
+
+Executable huffmanencode
+  Main-is:           encode.hs
+  Build-Depends:     base >= 3 && < 5,
+                     bytestring,
+                     ghc-binary,
+                     haskell98
+Executable huffmandecode
+  Main-is:           decode.hs
+  Build-Depends:     base >= 3 && < 5,
+                     bytestring,
+                     ghc-binary,
+                     haskell98
+

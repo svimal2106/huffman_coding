@@ -1,0 +1,26 @@
+*********************CS653 "Huffman Encoding/Decoding"*******************
+***************************Project Readme*********************************
+To install (this will generate binary in /home/bin/)
+
+	$cabal install --prefix=$HOME –user
+ or
+ 	$runhaskell Setup configure --user --prefix=$HOME
+	$runhaskell Setup build
+	$runhaskell Setup install
+
+then use as:
+>for encoding:
+	$huffmanencode test
+
+this will generate the compressed test.cmp file and one test.key file which is used while decoding
+
+>foe decoding:
+	$huffmandecode test.cmp test.key foo
+
+this will decode the test.cmp file using the test.key provided and put the result in foo
+
+
+this project has a darcs repository at patch-tag.com
+to get the patch:
+	$darcs get http://patch-tag.com/r/svimal/huffman_coding
+
